@@ -6,7 +6,7 @@ from .models import Singer, Album, PlayList
 from .services import toggleSongInPlayList, toggleSongLike, toggleAlbumLike
 from .serializers import (
    PlayListDetailSerializer, PlayListSerializer,
-   SingerDetailSerializer, AlbumDetailSerializer,
+   SingerDetailSerializer, AlbumDetailSerializer, SmallPlayListSerializer,
 )
 
 
@@ -21,7 +21,7 @@ class AlbumDetailView(generics.RetrieveAPIView):
 
 
 class PlayListsView(generics.ListAPIView):
-   serializer_class = PlayListSerializer
+   serializer_class = SmallPlayListSerializer
    def get_queryset(self):
       return PlayList.objects.filter(user=self.request.user).order_by('-id')
 
