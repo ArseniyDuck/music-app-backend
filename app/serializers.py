@@ -1,3 +1,4 @@
+from django.db import models
 import mutagen
 from rest_framework import fields, serializers
 from .models import Album, PlayList, Singer, Song
@@ -42,6 +43,17 @@ class PlayListSerializer(serializers.ModelSerializer):
    class Meta:
       model = PlayList
       fields = ('id', 'name', )
+
+   
+class SmallPlayListSerializer(serializers.ModelSerializer):
+   songs_count = serializers.SerializerMethodField('get_songs_count')
+
+   def get_songs_count(self, obj):
+      return obj.songs.count()
+
+   class Meta:
+      model = PlayList
+      fields = ('id', 'name', 'songs_count', )
 
 
 class SongSerializer(serializers.ModelSerializer):
