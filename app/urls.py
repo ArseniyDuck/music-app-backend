@@ -6,9 +6,10 @@ app_name = 'app'
 urlpatterns = [
    path('singer/<int:pk>/', SingerDetailView.as_view()),
    path('album/<int:pk>/', AlbumDetailView.as_view()),
+   path('playlist/<int:pk>/', PlayListDetailView.as_view()),
    
    path('playlists/', PlayListsView.as_view()),
-   path('playlist/<int:pk>/', PlayListDetailView.as_view()),
+   path('albums/', AlbumsView.as_view()),
    
    path('create_playlist/', PlayListCreateView.as_view()),
    path('delete_playlist/<int:pk>/', PlayListDeleteView.as_view()),

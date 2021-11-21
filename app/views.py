@@ -1,3 +1,5 @@
+from django.contrib.auth.models import User
+from django.http import request
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -6,7 +8,7 @@ from .models import Singer, Album, PlayList
 from .services import toggleSongInPlayList, toggleSongLike, toggleAlbumLike
 from .serializers import (
    PlayListDetailSerializer, PlayListSerializer,
-   SingerDetailSerializer, AlbumDetailSerializer, SmallPlayListSerializer,
+   SingerDetailSerializer, AlbumDetailSerializer, SmallAlbumListSeriailizer, SmallPlayListSerializer,
 )
 
 
@@ -24,6 +26,11 @@ class PlayListsView(generics.ListAPIView):
    serializer_class = SmallPlayListSerializer
    def get_queryset(self):
       return PlayList.objects.filter(user=self.request.user).order_by('-id')
+
+class AlbumsView(generics.ListAPIView):
+   serializer_class = SmallAlbumListSeriailizer
+   def get_queryset(self):
+      return [i.instance for i in self.request.user.albumlike_set.all()]
 
 
 class PlayListDetailView(generics.RetrieveAPIView):

@@ -68,6 +68,13 @@ class PlayList(models.Model):
    def get_ordered_songs(self):
       return self.songs.all().order_by('custommanytomanyfortrackingtimeinserted__time_inserted')
 
+   def get_photo(self):
+      first_song = self.get_ordered_songs().first()
+      if first_song:
+         return first_song.album.photo.url
+      return None
+         
+
    def __str__(self):
       return self.name
 

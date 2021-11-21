@@ -47,13 +47,28 @@ class PlayListSerializer(serializers.ModelSerializer):
    
 class SmallPlayListSerializer(serializers.ModelSerializer):
    songs_count = serializers.SerializerMethodField('get_songs_count')
+   photo = serializers.SerializerMethodField('get_photo')
+
+   def get_songs_count(self, obj):
+      return obj.songs.count()
+
+   def get_photo(self, obj):
+      return obj.get_photo()
+
+   class Meta:
+      model = PlayList
+      fields = ('id', 'name', 'songs_count', 'photo', )
+
+
+class SmallAlbumListSeriailizer(serializers.ModelSerializer):
+   songs_count = serializers.SerializerMethodField()
 
    def get_songs_count(self, obj):
       return obj.songs.count()
 
    class Meta:
-      model = PlayList
-      fields = ('id', 'name', 'songs_count', )
+      model = Album
+      fields = ('id', 'name', 'songs_count', 'photo')
 
 
 class SongSerializer(serializers.ModelSerializer):
