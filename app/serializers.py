@@ -1,10 +1,14 @@
+from django.contrib.auth.models import User
 from django.db import models
 import mutagen
-from rest_framework import fields, serializers
+from rest_framework import fields, request, serializers
 from .models import Album, PlayList, Singer, Song
 from .functions import accumulate_songs_duration
 from .color_picker import get_best_color
 from .functions import format_song_duration, accumulate_songs_duration
+from rest_framework.validators import UniqueValidator
+from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth import login
 
 
 class AlbumSerializer(serializers.ModelSerializer):
@@ -139,3 +143,31 @@ class TogggleSongInPlaylistSerializer(serializers.Serializer):
 
 class TogggleLikeSerializer(serializers.Serializer):
    id = serializers.IntegerField()
+
+
+class UserSerializer(serializers.ModelSerializer):
+   class Meta:
+      model = User
+      fields = ('id', 'username', )
+
+
+class RegisterSerializer(serializers.ModelSerializer):
+   password1 = serializers.CharField(write_only=True, required=True, validators=[validate_password])
+   password2 = serializers.CharField(write_only=True, required=True)
+
+   class Meta:
+      model = User
+      fields = ('username', 'password1', 'password2', )
+
+   def validate(self, attrs):
+      if attrs['password1'] != attrs['password2']:
+         raise serializers.ValidationError({'password1': 'Password fields didn\'t match.'})
+      return attrs
+
+   def create(self, validated_data):
+      user = User.objects.create_user(validated_data['username'])
+      user.set_password(validated_data['password1'])
+      user.save()
+      login(self.context['request'], user)
+      print(self.context['request'], user)
+      return user

@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import *
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 
 app_name = 'app'
@@ -20,4 +21,10 @@ urlpatterns = [
 
    path('toggle_song_like/', ToggleSongLikeView.as_view()),
    path('toggle_album_like/', ToggleAlbumLikeView.as_view()),
+
+   # authentication
+   path('me/', user),
+   path('token/obtain/', TokenObtainPairView.as_view()),
+   path('token/refresh/', TokenRefreshView.as_view()),
+   path('register/', RegisterView.as_view()),
 ]
