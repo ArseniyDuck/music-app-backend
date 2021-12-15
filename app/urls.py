@@ -11,6 +11,7 @@ urlpatterns = [
    
    path('playlists/', PlayListsView.as_view()),
    path('albums/', AlbumsView.as_view()),
+   path('liked/', LikedSongsView.as_view()),
    
    path('create_playlist/', PlayListCreateView.as_view()),
    path('delete_playlist/<int:pk>/', PlayListDeleteView.as_view()),

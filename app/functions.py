@@ -5,7 +5,7 @@ def format_album_duration(seconds):
    s = seconds % 60
    m = seconds // 60
    h = 0
-   if m > 60:
+   if m >= 60:
       h = m // 60
       m = m % 60
    if h > 0:

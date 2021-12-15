@@ -1,6 +1,7 @@
+import re
 from django.contrib.auth.models import User
 from django.http import request
-from rest_framework import generics
+from rest_framework import generics, serializers
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -12,8 +13,8 @@ from app.color_picker import get_best_color
 from .models import Singer, Album, PlayList
 from .services import toggleSongInPlayList, toggleSongLike, toggleAlbumLike
 from .serializers import (
-   PlayListDetailSerializer, PlayListSerializer, RegisterSerializer,
-   SingerDetailSerializer, AlbumDetailSerializer, SmallAlbumListSeriailizer, SmallPlayListSerializer, UserSerializer,
+   LikedSongsPlaylistSerializer, PlayListDetailSerializer, PlayListSerializer, RegisterSerializer,
+   SingerDetailSerializer, AlbumDetailSerializer, SmallAlbumListSeriailizer, SmallPlayListSerializer, SongSerializer, UserSerializer,
 )
 
 
@@ -25,8 +26,8 @@ class SingerDetailView(generics.RetrieveAPIView):
 
 
 class AlbumDetailView(generics.RetrieveAPIView):
-   permission_classes = (IsAuthenticated, )
    authentication_classes = (JWTAuthentication, )
+   permission_classes = (AllowAny, ) 
    queryset = Album.objects.all()
    serializer_class = AlbumDetailSerializer
 
@@ -103,6 +104,14 @@ class ToggleAlbumLikeView(APIView):
    authentication_classes = (JWTAuthentication, )
    def post(self, request):
       return toggleAlbumLike(request)
+
+
+class LikedSongsView(APIView):
+   permission_classes = (IsAuthenticated, )
+   authentication_classes = (JWTAuthentication, )
+   def get(self, request):
+      serializer = LikedSongsPlaylistSerializer(request.user, context={'request': request})
+      return Response(serializer.data)
 
 
 @api_view()

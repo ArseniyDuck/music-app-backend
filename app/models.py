@@ -95,11 +95,11 @@ class SongLike(AbstractLike):
    instance = models.ForeignKey(to=Song, on_delete=models.CASCADE, related_name='likes')
 
    def __str__(self):
-      return f'{self.user.name}\'s like of song {self.song.name}'
+      return f'{self.user.username}\'s like of song {self.instance.name}'
 
 
 class AlbumLike(AbstractLike):
    instance = models.ForeignKey(to=Album, on_delete=models.CASCADE, related_name='likes')
 
    def __str__(self):
-      return f'{self.user.name}\'s like of song {self.album.name}'
+      return f'{self.user.username}\'s like of song {self.instance.name}'

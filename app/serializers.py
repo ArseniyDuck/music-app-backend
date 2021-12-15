@@ -85,7 +85,9 @@ class SongSerializer(serializers.ModelSerializer):
       return format_song_duration(duration)
 
    def get_is_liked(self, obj):
-      return bool(obj.likes.filter(user=self.context.get('request').user))
+      request = self.context['request']
+      if request.user.is_authenticated:
+         return bool(obj.likes.filter(user=request.user))
 
    class Meta:
       model = Song
@@ -129,7 +131,9 @@ class AlbumDetailSerializer(serializers.ModelSerializer):
       return accumulate_songs_duration(obj.songs.all())
 
    def get_is_liked(self, obj):
-      return bool(obj.likes.filter(user=self.context.get('request').user))
+      request = self.context.get('request')
+      if request.user.is_authenticated:
+         return bool(obj.likes.filter(user=request.user))
 
    class Meta:
       model = Album
@@ -169,5 +173,23 @@ class RegisterSerializer(serializers.ModelSerializer):
       user.set_password(validated_data['password1'])
       user.save()
       login(self.context['request'], user)
-      print(self.context['request'], user)
       return user
+
+
+class LikedSongsPlaylistSerializer(serializers.ModelSerializer):
+   songs = serializers.SerializerMethodField()
+   duration = serializers.SerializerMethodField()
+
+   def get_songs(self, obj):
+      return PlaylistSongSerializer(
+         reversed([i.instance for i in obj.songlike_set.all()]),
+         context = {'request': self.context['request']},
+         many=True
+      ).data
+
+   def get_duration(self, obj):
+      return accumulate_songs_duration([i.instance for i in obj.songlike_set.all()])
+
+   class Meta:
+      model = User
+      fields = ('username', 'songs', 'duration', )
