@@ -19,7 +19,7 @@ from .serializers import (
 
 
 class SingerDetailView(generics.RetrieveAPIView):
-   permission_classes = (IsAuthenticated, )
+   permission_classes = (AllowAny, )
    authentication_classes = (JWTAuthentication, )
    queryset = Singer.objects.all()
    serializer_class = SingerDetailSerializer
@@ -49,7 +49,7 @@ class AlbumsView(generics.ListAPIView):
 
    
 class SingersView(generics.ListAPIView):
-   permission_classes = (AllowAny, )
+   permission_classes = (IsAuthenticated, )
    authentication_classes = (JWTAuthentication, )
    serializer_class = SmallSingerSerializer
    def get_queryset(self):

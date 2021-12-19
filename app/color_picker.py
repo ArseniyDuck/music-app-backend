@@ -81,7 +81,7 @@ class SpotifyBackgroundColor():
 
       if max_colorful < color_tol:
          # If not colorful, set to gray
-         best_color = [100, 100, 100]
+         best_color = [140, 140, 140]
       else:
          # Pick the most colorful color
          best_color = centroids[np.argmax(colorfulness)]
