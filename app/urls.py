@@ -11,6 +11,7 @@ urlpatterns = [
    
    path('playlists/', PlayListsView.as_view()),
    path('albums/', AlbumsView.as_view()),
+   path('singers/', SingersView.as_view()),
    path('liked/', LikedSongsView.as_view()),
    
    path('create_playlist/', PlayListCreateView.as_view()),
@@ -20,8 +21,9 @@ urlpatterns = [
    path('add_song/', AddSongView.as_view()),
    path('remove_song/', RemoveSongView.as_view()),
 
-   path('toggle_song_like/', ToggleSongLikeView.as_view()),
-   path('toggle_album_like/', ToggleAlbumLikeView.as_view()),
+   path('switch_song_like/', SwitchSongLikeView.as_view()),
+   path('switch_album_like/', SwitchAlbumLikeView.as_view()),
+   path('switch_singer_like/', SwitchSingerLikeView.as_view()),
 
    # authentication
    path('me/', user),

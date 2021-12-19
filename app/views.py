@@ -11,10 +11,10 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.contrib.auth import authenticate
 from app.color_picker import get_best_color
 from .models import Singer, Album, PlayList
-from .services import toggleSongInPlayList, toggleSongLike, toggleAlbumLike
+from .services import switchSongInPlayList, switch_song_like, switch_album_like, switch_singer_like
 from .serializers import (
    LikedSongsPlaylistSerializer, PlayListDetailSerializer, PlayListSerializer, RegisterSerializer,
-   SingerDetailSerializer, AlbumDetailSerializer, SmallAlbumListSeriailizer, SmallPlayListSerializer, SongSerializer, UserSerializer,
+   SingerDetailSerializer, AlbumDetailSerializer, SmallAlbumListSeriailizer, SmallPlayListSerializer, SmallSingerSerializer, SongSerializer, UserSerializer,
 )
 
 
@@ -46,6 +46,14 @@ class AlbumsView(generics.ListAPIView):
    serializer_class = SmallAlbumListSeriailizer
    def get_queryset(self):
       return [i.instance for i in self.request.user.albumlike_set.all()]
+
+   
+class SingersView(generics.ListAPIView):
+   permission_classes = (AllowAny, )
+   authentication_classes = (JWTAuthentication, )
+   serializer_class = SmallSingerSerializer
+   def get_queryset(self):
+      return [i.instance for i in self.request.user.singerlike_set.all()]
 
 
 class PlayListDetailView(generics.RetrieveAPIView):
@@ -82,28 +90,35 @@ class AddSongView(APIView):
    permission_classes = (IsAuthenticated, )
    authentication_classes = (JWTAuthentication, )
    def post(self, request):
-      return toggleSongInPlayList(request, mode='add')
+      return switchSongInPlayList(request, mode='add')
 
 
 class RemoveSongView(APIView):
    permission_classes = (IsAuthenticated, )
    authentication_classes = (JWTAuthentication, )
    def post(self, request):
-      return toggleSongInPlayList(request, mode='remove')
+      return switchSongInPlayList(request, mode='remove')
 
 
-class ToggleSongLikeView(APIView):
+class SwitchSongLikeView(APIView):
    permission_classes = (IsAuthenticated, )
    authentication_classes = (JWTAuthentication, )
    def post(self, request):
-      return toggleSongLike(request)
+      return switch_song_like(request)
 
    
-class ToggleAlbumLikeView(APIView):
+class SwitchAlbumLikeView(APIView):
    permission_classes = (IsAuthenticated, )
    authentication_classes = (JWTAuthentication, )
    def post(self, request):
-      return toggleAlbumLike(request)
+      return switch_album_like(request)
+
+   
+class SwitchSingerLikeView(APIView):
+   permission_classes = (IsAuthenticated, )
+   authentication_classes = (JWTAuthentication, )
+   def post(self, request):
+      return switch_singer_like(request)
 
 
 class LikedSongsView(APIView):

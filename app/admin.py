@@ -7,6 +7,7 @@ admin.site.register(Genre)
 
 
 class SingerAdmin(admin.ModelAdmin):
+   fields = ('name', 'photo', 'genres', )
    filter_horizontal = ('genres', )
 admin.site.register(Singer, SingerAdmin)
 

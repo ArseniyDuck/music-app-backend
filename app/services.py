@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404
 from django.http.response import HttpResponse
 from rest_framework.response import Response
-from .models import Album, AlbumLike, PlayList, Song, SongLike
+from .models import Album, AlbumLike, PlayList, Singer, SingerLike, Song, SongLike
 from .serializers import TogggleSongInPlaylistSerializer, TogggleLikeSerializer
 from .functions import format_album_duration
 
@@ -13,8 +13,8 @@ def _get_or_create_like(user, id, model_class, like_model_class):
    like, created = like_model_class.objects.get_or_create(user=user, instance=model_instance)
    return like, created
 
-def _like_toggler_creator(model_class, like_model_class):
-   def toggler(request):
+def _like_switcher_creator(model_class, like_model_class):
+   def switcher(request):
       serializer = TogggleLikeSerializer(data=request.data)
       if serializer.is_valid():
          like, created = _get_or_create_like(
@@ -30,15 +30,17 @@ def _like_toggler_creator(model_class, like_model_class):
             return Response(serializer.data, status=200)
       return HttpResponse(status=400)
 
-   return toggler
+   return switcher
 
 
-toggleSongLike = _like_toggler_creator(Song, SongLike)
+switch_song_like = _like_switcher_creator(Song, SongLike)
 
-toggleAlbumLike = _like_toggler_creator(Album, AlbumLike)
+switch_album_like = _like_switcher_creator(Album, AlbumLike)
+
+switch_singer_like = _like_switcher_creator(Singer, SingerLike)
 
 
-def toggleSongInPlayList(request, mode):
+def switchSongInPlayList(request, mode):
    serializer = TogggleSongInPlaylistSerializer(data=request.data)
    if serializer.is_valid():
       playlist = get_object_or_404(

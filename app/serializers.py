@@ -2,13 +2,14 @@ from django.contrib.auth.models import User
 from django.db import models
 import mutagen
 from rest_framework import fields, request, serializers
-from .models import Album, PlayList, Singer, Song
+from .models import Album, Genre, PlayList, Singer, Song
 from .functions import accumulate_songs_duration
 from .color_picker import get_best_color
 from .functions import format_song_duration, accumulate_songs_duration
 from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth import login
+from itertools import chain
 
 
 class AlbumSerializer(serializers.ModelSerializer):
@@ -25,11 +26,30 @@ class SingerSerializer(serializers.ModelSerializer):
 
 class SingerDetailSerializer(serializers.ModelSerializer):
    genres = serializers.SlugRelatedField(slug_field='name', read_only=True, many=True)
+   is_liked = serializers.SerializerMethodField()
+   songs = serializers.SerializerMethodField()
    albums = AlbumSerializer(many=True)
+   likes_count = serializers.SerializerMethodField()
+
+   def get_is_liked(self, obj):
+      request = self.context['request']
+      if request.user.is_authenticated:
+         return bool(obj.likes.filter(user=request.user))
+
+   def get_songs(self, obj):
+      return PlaylistSongSerializer(
+         list(chain(*[i.songs.all() for i in obj.albums.all()]))[:10],
+         context = {'request': self.context['request']},
+         many=True
+      ).data
+
+   def get_likes_count(self, obj):
+      return obj.likes.count()
+
 
    class Meta:
       model = Singer
-      fields = ('id', 'name', 'photo', 'genres', 'albums', )
+      fields = ('id', 'name', 'photo', 'genres', 'is_liked', 'likes_count', 'best_color', 'albums', 'songs', )
 
 
 class PlayListSerializer(serializers.ModelSerializer):
@@ -75,9 +95,17 @@ class SmallAlbumListSeriailizer(serializers.ModelSerializer):
       fields = ('id', 'name', 'songs_count', 'photo')
 
 
+class SmallSingerSerializer(serializers.ModelSerializer):
+   genres = serializers.SlugRelatedField(slug_field='name', read_only=True, many=True)
+
+   class Meta:
+      model = Singer
+      fields = ('id', 'name', 'photo', 'genres', )
+
+
 class SongSerializer(serializers.ModelSerializer):
-   duration = serializers.SerializerMethodField('get_duration')
-   is_liked = serializers.SerializerMethodField('get_is_liked')
+   duration = serializers.SerializerMethodField()
+   is_liked = serializers.SerializerMethodField()
 
    def get_duration(self, obj):
       audio_info = mutagen.File(obj.audio).info

@@ -14,6 +14,12 @@ class Singer(models.Model):
    name = models.CharField(max_length=240, verbose_name='singer name')
    photo = models.ImageField(upload_to='singers_photos/', null=True, verbose_name='singer photo file')
    genres = models.ManyToManyField(to=Genre, verbose_name='singer genres list')
+   best_color = models.CharField(max_length=18)
+
+   def save(self, *args, **kwargs):
+      # todo: accumulate duration in save method
+      self.best_color = get_best_color(self.photo)
+      super(Singer, self).save(*args, **kwargs)
 
    def __str__(self):
       return self.name
@@ -28,8 +34,7 @@ class Album(models.Model):
 
    def save(self, *args, **kwargs):
       # todo: accumulate duration in save method
-      if not self.id:
-         self.best_color = get_best_color(self.photo)
+      self.best_color = get_best_color(self.photo)
       super(Album, self).save(*args, **kwargs)
 
    def __str__(self):
@@ -93,13 +98,17 @@ class AbstractLike(models.Model):
 
 class SongLike(AbstractLike):
    instance = models.ForeignKey(to=Song, on_delete=models.CASCADE, related_name='likes')
-
    def __str__(self):
       return f'{self.user.username}\'s like of song {self.instance.name}'
 
 
 class AlbumLike(AbstractLike):
    instance = models.ForeignKey(to=Album, on_delete=models.CASCADE, related_name='likes')
+   def __str__(self):
+      return f'{self.user.username}\'s like of song {self.instance.name}'
 
+
+class SingerLike(AbstractLike):
+   instance = models.ForeignKey(to=Singer, on_delete=models.CASCADE, related_name='likes')
    def __str__(self):
       return f'{self.user.username}\'s like of song {self.instance.name}'
